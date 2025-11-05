@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1093150853537",
+    "project_id": "test2-adbee",
+    "storage_bucket": "test2-adbee.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1093150853537:android:c6b98374402a48107923e0",
+        "android_client_info": {
+          "package_name": "com.example.junior_app_fixed"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDD-ZHgHs7ajyBhl9k1abmYKwAge9zNE3w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

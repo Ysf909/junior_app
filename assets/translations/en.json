@@ -1,0 +1,43 @@
+{
+  "app_title": "Junior App",
+  "welcome": "Welcome",
+  "login": "Login",
+  "logout": "Logout",
+  "signup": "Sign up",
+  "home": "Home",
+  "settings": "Settings",
+  "language": "Language",
+  "dark_mode": "Dark Mode",
+  "first_login": "First login: {date}",
+  "network_status_online": "You are online",
+  "network_status_offline": "You are offline",
+  "photos": "Photos",
+  "timer": "Timer",
+  "cloud": "Cloud",
+  "ok": "OK",
+  "cancel": "Cancel",
+  "email": "Email",
+  "password": "Password",
+  "login_failed": "Login failed. Check your data.",
+  "first_name": "First name",
+  "last_name": "Last name",
+  "confirm_password": "Confirm password",
+  "signup_failed": "Signup failed. Please try again.",
+  "item": "Item",
+  "no_photo_selected": "No photo selected",
+  "pick_photo": "Pick a photo",
+  "start": "Start",
+  "pause": "Pause",
+  "reset": "Reset",
+  "details": "Details",
+  "title": "Title",
+  "status": "Status",
+  "done": "Done",
+  "pending": "Pending"
+
+
+
+
+
+  
+}
