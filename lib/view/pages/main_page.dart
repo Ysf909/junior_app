@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:junior_app/services/localization_extension.dart';
 import 'package:junior_app/view/pages/cloud_page.dart';
+import 'package:junior_app/view/pages/join_room_page.dart';
 import 'package:junior_app/view/pages/listview_page.dart';
 import 'package:junior_app/view/pages/photo_library_page.dart';
 import 'package:junior_app/view/pages/timer_page.dart';
@@ -13,6 +14,7 @@ import 'package:junior_app/view_model/photo_library_view_model.dart';
 import 'package:junior_app/view_model/timer_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:junior_app/view_model/theme_view_model.dart';
+import 'package:junior_app/view/pages/location_view.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -56,7 +58,6 @@ class _MainPageState extends State<MainPage> {
       );
     }
 
-    // Responsive breakpoint: wide screens get a fixed side menu
     final bool isWide = MediaQuery.of(context).size.width >= 900;
 
     return WillPopScope(
@@ -89,10 +90,8 @@ class _MainPageState extends State<MainPage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text(navVM.screenTitle),
-          // For a permanent sidebar, no hamburger needed
           automaticallyImplyLeading: !isWide,
           actions: [
-            // Theme toggle (MVVM)
             IconButton(
               tooltip: 'Toggle Theme',
               onPressed: () => context.read<ThemeViewModel>().toggle(),
@@ -102,7 +101,6 @@ class _MainPageState extends State<MainPage> {
                     : Icons.light_mode,
               ),
             ),
-
             if (navVM.currentScreen == AppScreen.timer)
               Padding(
                 padding: const EdgeInsets.only(right: 16.0, top: 16.0),
@@ -115,15 +113,11 @@ class _MainPageState extends State<MainPage> {
               ),
           ],
         ),
-
-        // Drawer only on narrow screens
         drawer: isWide ? null : _buildDrawer(context, authVM, navVM, timerVM),
-
-        // Body: fixed sidebar + content on wide screens; just content on narrow
         body: Row(
           children: [
             if (isWide)
-              _buildSideMenu(context, authVM, navVM, timerVM), // fixed sidebar
+              _buildSideMenu(context, authVM, navVM, timerVM),
             Expanded(child: _buildCurrentScreen(navVM.currentScreen)),
           ],
         ),
@@ -132,130 +126,140 @@ class _MainPageState extends State<MainPage> {
   }
 
   // ---------- Fixed side menu (for wide screens) ----------
- Widget _buildSideMenu(BuildContext context, AuthViewModel authVM,
-    NavigationViewModel navVM, TimerViewModel timerVM) {
-  final colorScheme = Theme.of(context).colorScheme;
+  Widget _buildSideMenu(BuildContext context, AuthViewModel authVM,
+      NavigationViewModel navVM, TimerViewModel timerVM) {
+    final colorScheme = Theme.of(context).colorScheme;
 
-  return SizedBox(
-    width: 260,
-    child: Container(
-      color: colorScheme.surface,
-      child: Column(
-        children: [
-          // Header fills width
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(16),
-            color: colorScheme.primary,
-            child: Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: Colors.white,
-                  child: Text(
-                    (authVM.username?.isNotEmpty == true
-                            ? authVM.username!.substring(0, 1)
-                            : 'U')
-                        .toUpperCase(),
-                    style: TextStyle(
-                      fontSize: 24,
-                      color: colorScheme.primary,
+    return SizedBox(
+      width: 260,
+      child: Container(
+        color: colorScheme.surface,
+        child: Column(
+          children: [
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              color: colorScheme.primary,
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    backgroundColor: Colors.white,
+                    child: Text(
+                      (authVM.username?.isNotEmpty == true
+                              ? authVM.username!.substring(0, 1)
+                              : 'U')
+                          .toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: colorScheme.primary,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        authVM.username ?? 'User',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          authVM.username ?? 'User',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Total time: ${timerVM.formattedTotalTime}',
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
+                        const SizedBox(height: 4),
+                        Text(
+                          'Total time: ${timerVM.formattedTotalTime}',
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-
-          // Expanded list fills remaining height
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                _buildDrawerItem(
-                  icon: Icons.timer,
-                  title: 'Timer',
-                  onTap: () => navVM.navigateTo(AppScreen.timer),
-                  isSelected: navVM.currentScreen == AppScreen.timer,
-                  closeAfterTap: false,
-                ),
-                _buildDrawerItem(
-                  icon: Icons.dark_mode,
-                  title: 'Dark Mode',
-                  onTap: () => context.read<ThemeViewModel>().toggle(),
-                  closeAfterTap: false,
-                ),
-                _buildDrawerItem(
-                  icon: Icons.list,
-                  title: 'List View',
-                  onTap: () => navVM.navigateTo(AppScreen.listView),
-                  isSelected: navVM.currentScreen == AppScreen.listView,
-                  closeAfterTap: false,
-                ),
-                _buildDrawerItem(
-                  icon: Icons.photo_library,
-                  title: 'Gallery',
-                  onTap: () => navVM.navigateTo(AppScreen.gallery),
-                  isSelected: navVM.currentScreen == AppScreen.gallery,
-                  closeAfterTap: false,
-                ),
-                _buildDrawerItem(
-                  icon: Icons.network_check,
-                  title: 'Network Service',
-                  onTap: () => navVM.navigateTo(AppScreen.network),
-                  isSelected: navVM.currentScreen == AppScreen.network,
-                  closeAfterTap: false,
-                ),
-                ListTile(
-                  leading: const Icon(Icons.language),
-                  title: const Text('Language'),
-                  onTap: () {
-                    final loc = context.read<LocalizationViewModel>();
-                    final isArabic = loc.locale.languageCode == 'ar';
-                    loc.changeLanguage(isArabic ? 'en' : 'ar');
-                  },
-                ),
-                const Divider(),
-                _buildDrawerItem(
-                  icon: Icons.logout,
-                  title: 'Logout',
-                  onTap: () => _showLogoutDialog(context, authVM),
-                  closeAfterTap: false,
-                ),
-              ],
+            Expanded(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  _buildDrawerItem(
+                    icon: Icons.timer,
+                    title: 'Timer',
+                    onTap: () => navVM.navigateTo(AppScreen.timer),
+                    isSelected: navVM.currentScreen == AppScreen.timer,
+                    closeAfterTap: false,
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.dark_mode,
+                    title: 'Dark Mode',
+                    onTap: () => context.read<ThemeViewModel>().toggle(),
+                    closeAfterTap: false,
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.list,
+                    title: 'List View',
+                    onTap: () => navVM.navigateTo(AppScreen.listView),
+                    isSelected: navVM.currentScreen == AppScreen.listView,
+                    closeAfterTap: false,
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.location_on,
+                    title: 'Location',
+                    onTap: () => navVM.navigateTo(AppScreen.location),
+                    isSelected: navVM.currentScreen == AppScreen.location,
+                    closeAfterTap: false,
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.photo_library,
+                    title: 'Gallery',
+                    onTap: () => navVM.navigateTo(AppScreen.gallery),
+                    isSelected: navVM.currentScreen == AppScreen.gallery,
+                    closeAfterTap: false,
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.chat_outlined,
+                    title: 'Chat',
+                    onTap: () => navVM.navigateTo(AppScreen.ChatPage),
+                    isSelected: navVM.currentScreen == AppScreen.ChatPage,
+                    closeAfterTap: false,
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.network_check,
+                    title: 'Network Service',
+                    onTap: () => navVM.navigateTo(AppScreen.network),
+                    isSelected: navVM.currentScreen == AppScreen.network,
+                    closeAfterTap: false,
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.language),
+                    title: const Text('Language'),
+                    onTap: () {
+                      final loc = context.read<LocalizationViewModel>();
+                      final isArabic = loc.locale.languageCode == 'ar';
+                      loc.changeLanguage(isArabic ? 'en' : 'ar');
+                    },
+                  ),
+                  const Divider(),
+                  _buildDrawerItem(
+                    icon: Icons.logout,
+                    title: 'Logout',
+                    onTap: () => _showLogoutDialog(context, authVM),
+                    closeAfterTap: false,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   // ---------- Drawer (for narrow screens) ----------
   Widget _buildDrawer(BuildContext context, AuthViewModel authVM,
@@ -273,7 +277,8 @@ class _MainPageState extends State<MainPage> {
                   backgroundColor: Colors.white,
                   child: Text(
                     authVM.username?.substring(0, 1).toUpperCase() ?? 'U',
-                    style: const TextStyle(fontSize: 24, color: Colors.blue),
+                    style:
+                        const TextStyle(fontSize: 24, color: Colors.blue),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -292,10 +297,14 @@ class _MainPageState extends State<MainPage> {
           _buildDrawerItem(
             icon: Icons.timer,
             title: 'Timer',
-            onTap: () {
-              navVM.navigateTo(AppScreen.timer);
-            },
+            onTap: () => navVM.navigateTo(AppScreen.timer),
             isSelected: navVM.currentScreen == AppScreen.timer,
+          ),
+          _buildDrawerItem(
+            icon: Icons.location_on,
+            title: 'Location',
+            onTap: () => navVM.navigateTo(AppScreen.location),
+            isSelected: navVM.currentScreen == AppScreen.location,
           ),
           _buildDrawerItem(
             icon: Icons.dark_mode,
@@ -305,25 +314,25 @@ class _MainPageState extends State<MainPage> {
           _buildDrawerItem(
             icon: Icons.list,
             title: 'List View',
-            onTap: () {
-              navVM.navigateTo(AppScreen.listView);
-            },
+            onTap: () => navVM.navigateTo(AppScreen.listView),
             isSelected: navVM.currentScreen == AppScreen.listView,
           ),
           _buildDrawerItem(
             icon: Icons.photo_library,
             title: 'Gallery',
-            onTap: () {
-              navVM.navigateTo(AppScreen.gallery);
-            },
+            onTap: () => navVM.navigateTo(AppScreen.gallery),
             isSelected: navVM.currentScreen == AppScreen.gallery,
+          ),
+          _buildDrawerItem(
+            icon: Icons.chat_outlined,
+            title: 'Chat',
+            onTap: () => navVM.navigateTo(AppScreen.ChatPage),
+            isSelected: navVM.currentScreen == AppScreen.ChatPage,
           ),
           _buildDrawerItem(
             icon: Icons.network_check,
             title: 'Network Service',
-            onTap: () {
-              navVM.navigateTo(AppScreen.network);
-            },
+            onTap: () => navVM.navigateTo(AppScreen.network),
             isSelected: navVM.currentScreen == AppScreen.network,
           ),
           ListTile(
@@ -347,20 +356,20 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  // Shared list tile
   ListTile _buildDrawerItem({
     required IconData icon,
     required String title,
     required VoidCallback onTap,
     bool isSelected = false,
-    bool closeAfterTap = true, // true for Drawer; false for fixed sidebar
+    bool closeAfterTap = true,
   }) {
     return ListTile(
       leading: Icon(icon, color: isSelected ? Colors.blue : null),
       title: Text(
         title,
         style: TextStyle(
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          fontWeight:
+              isSelected ? FontWeight.bold : FontWeight.normal,
         ),
       ),
       tileColor: isSelected ? Colors.blue.withOpacity(0.08) : null,
@@ -373,7 +382,7 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  // Content
+  // 👇 IMPORTANT: Chat screen now = JoinChatPage, not ChatPage directly
   Widget _buildCurrentScreen(AppScreen screen) {
     switch (screen) {
       case AppScreen.timer:
@@ -384,6 +393,10 @@ class _MainPageState extends State<MainPage> {
         return const GalleryScreen();
       case AppScreen.network:
         return const CloudPage();
+      case AppScreen.location:
+        return LocationView();
+      case AppScreen.ChatPage:
+        return  JoinChatPage();
     }
   }
 
@@ -419,8 +432,8 @@ class _MainPageState extends State<MainPage> {
     );
   }
 
-  Future<void> _performLogout(BuildContext context, AuthViewModel authVM) async {
-    // Clear all data from view models
+  Future<void> _performLogout(
+      BuildContext context, AuthViewModel authVM) async {
     final timerVM = Provider.of<TimerViewModel>(context, listen: false);
     final galleryVM = Provider.of<GalleryViewModel>(context, listen: false);
     final networkVM = Provider.of<NetworkViewModel>(context, listen: false);
@@ -430,7 +443,6 @@ class _MainPageState extends State<MainPage> {
     await networkVM.clearData();
     await authVM.logout();
 
-    // Navigate to login screen
     Navigator.pushReplacementNamed(context, '/login');
   }
 }

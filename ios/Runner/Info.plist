@@ -9,6 +9,8 @@
 <key>NSLocationWhenInUseUsageDescription</key>
 <string>This app uses location to monitor Wi-Fi and network status.</string>
 
+	<key>GMSApiKey</key>
+	<string>AIzaSyB7EydGaCIVEE6masjiF8HKtNQPNDpjcOI</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

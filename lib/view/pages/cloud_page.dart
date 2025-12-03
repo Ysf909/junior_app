@@ -1,7 +1,6 @@
 ﻿import 'package:flutter/material.dart';
 import 'package:junior_app/services/localization_extension.dart';
 import 'package:junior_app/model/network_status.dart';
-import 'package:junior_app/view_model/localization_view_model.dart';
 import 'package:provider/provider.dart';
 import '/view_model/network_view_model.dart';
 

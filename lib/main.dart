@@ -1,5 +1,5 @@
 ﻿import 'package:flutter/material.dart';
-import 'package:junior_app/services/localization_extension.dart';
+import 'package:junior_app/view_model/location_view_model.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
@@ -20,13 +20,18 @@ import 'package:junior_app/view_model/photo_library_view_model.dart';
 import 'package:junior_app/view_model/todo_view_model.dart';
 import 'package:junior_app/view_model/theme_view_model.dart';
 import 'package:junior_app/view_model/localization_view_model.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 // âš ï¸ you can delete this import because we're not actually using easy_localization here
 // import 'package:junior_app/extensions/localization_extension.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   // init localization BEFORE runApp
   final localizationVM = LocalizationViewModel();
   await localizationVM.init();
@@ -46,6 +51,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => NetworkViewModel()),
         ChangeNotifierProvider(create: (_) => GalleryViewModel()),
         ChangeNotifierProvider(create: (_) => TodoViewModel()),
+        ChangeNotifierProvider(create: (_) => LocationViewModel()),
       ],
       child: const MyApp(),
     ),

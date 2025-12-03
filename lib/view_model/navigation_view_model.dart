@@ -6,7 +6,8 @@ enum AppScreen {
   timer,
   listView,
   gallery,
-  network,
+  network, location,
+  ChatPage,
 }
 
 class NavigationViewModel with ChangeNotifier {
@@ -35,6 +36,12 @@ class NavigationViewModel with ChangeNotifier {
         break;
       case AppScreen.network:
         _screenTitle = 'Network Service';
+        break;
+      case AppScreen.location:
+        _screenTitle = 'Location';
+        break;
+      case AppScreen.ChatPage:
+        _screenTitle = 'Chat';
         break;
     }
   }
